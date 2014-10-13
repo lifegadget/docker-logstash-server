@@ -1,4 +1,48 @@
 #!/bin/bash
 
-service redis-server start
-service elasticsearch start
+function initStorage() {
+	mkdir -p /storage/lib
+	mv /var/lib/elasticsearch /storage/lib
+	echo " - elasticsearch has been moved to storage locker"
+}
+
+function linkStorage() {
+	if [[ -d "/var/lib/elasticsearch" ]];then
+		rm -rf /var/lib/elasticsearch
+	fi
+	ln -s /storage/lib/elasticsearch /var/lib/elasticsearch
+	echo " - elasticsearch symlinks established"
+}
+
+function startServices() {
+	# service rsyslog start
+	service redis-server start
+	/etc/init.d/elasticsearch start
+	service logstash start
+	/opt/logstash/bin/logstash web &
+}
+
+case "$1" in
+	start)
+		# Link up storage so state is maintained beyond just this running container
+		if [[ -d "/storage/lib" ]];then
+			echo "Storage appears to be already existant";
+			linkStorage;
+		else
+			echo "Storage container has not been initialised ...";
+			initStorage;
+			linkStorage;
+		fi
+		startServices;
+		logger '{"type": "docker", "message": "logstash services started"}';
+
+		trap "echo Exiting Logstash Server; service logstash stop; service elasticsearch stop; service redis stop; exit 0;" SIGINT SIGTERM SIGTSTP
+		while true; do
+			sleep 1;
+		done
+	;;
+	cert)
+		cat /app/certs/server.crt
+	;;
+esac
+
