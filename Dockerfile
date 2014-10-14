@@ -24,7 +24,10 @@ RUN mkdir -p /app \
 
 # Move default configuration files into place
 COPY resources/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
-COPY resources/logstash.conf /etc/logstash/conf.d/central.conf
+COPY resources/inputs /etc/logstash/conf.d
+COPY resources/filters /etc/logstash/conf.d
+COPY resources/outputs /etc/logstash/conf.d
+# Convenience shortcut
 RUN ln -s /etc/logstash/conf.d /app/conf
 
 # Add conveniences to Bash shell when working within the container
@@ -58,10 +61,10 @@ RUN mkdir -p /home/ubuntu
 RUN openssl genrsa -out /app/certs/server.key 2048	\
 	&& openssl req -new -key /app/certs/server.key	-batch -out /app/certs/server.csr \
 	&& openssl x509 -req -days 3650 -in /app/certs/server.csr -signkey /app/certs/server.key -out /app/certs/server.crt
+# Create initial log file for docker CLI
+RUN touch /var/log/docker-cli.log	
+	
 VOLUME ["/app/certs"]
-# rsyslog
-# RUN apt-get install -yqq rsyslog
-# COPY resources/rsyslog.conf /etc/rsyslog.conf
 
 # Start logstash
 COPY resources/logstash-server /usr/local/bin/logstash-server
