@@ -12,13 +12,13 @@ function logIt() {
 	openssl_version=`openssl version`
 	facility_label="user-level"
 	facility=1
-	echo "{ " /
-		"\"timestamp\": \"$timestamp\", "/
-		"\"host\": \"${hostname}\", "/
-		"\"server_software\": [ \"${openssl_version}\" ], "/
-		"\"facility_label\": \"${facility_label}\", "/
-		"\"severity\":\"$severity\", "/
-		"\"message\": \"$1\" }" >> $logFile
+	echo "{ /
+		\"timestamp\": \"$timestamp\", /
+		\"host\": \"${hostname}\", /
+		\"server_software\": [ \"${openssl_version}\" ], /
+		\"facility_label\": \"${facility_label}\", /
+		\"severity\":\"$severity\", /
+		\"message\": \"$1\" }" >> $logFile
 }
 
 function initStorage() {
