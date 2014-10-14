@@ -1,5 +1,25 @@
 #!/bin/bash
-logFile="/var/log/docker-cli.log"
+logFile="/storage/docker-cli.log"
+
+function logIt() {
+	timestamp=$( date )
+	if [ -z "$2" ];then
+		severity="INFO"
+	else
+		severity="$2"
+	fi
+	hostname=`hostname`
+	openssl_version=`openssl version`
+	facility_label="user-level"
+	facility=1
+	echo "{ " /
+		"\"timestamp\": \"$timestamp\", "/
+		"\"host\": \"${hostname}\", "/
+		"\"server_software\": [ \"${openssl_version}\" ], "/
+		"\"facility_label\": \"${facility_label}\", "/
+		"\"severity\":\"$severity\", "/
+		"\"message\": \"$1\" }" >> $logFile
+}
 
 function initStorage() {
 	mkdir -p /storage/lib
@@ -35,8 +55,8 @@ case "$1" in
 			linkStorage;
 		fi
 		startServices;
-		timestamp=$( date +"%T" )
-		echo "{\"timestamp\":$timestamp, \"message\": \"logstash services started using CLI\"}" >> $logFile
+		
+		logIt "logstash services started using CLI" 
 
 		trap "echo Exiting Logstash Server; service logstash stop; service elasticsearch stop; service redis stop; exit 0;" SIGINT SIGTERM SIGTSTP
 		while true; do
@@ -45,7 +65,7 @@ case "$1" in
 	;;
 	cert)
 		cat /app/certs/server.crt
-		echo "{\"timestamp\":$timestamp, \"message\": \"request for SSL CRT certificate from CLI\"}" >> $logFile
+		logIt "request for SSL CRT certificate from CLI"
 	;;
 esac
 

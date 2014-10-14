@@ -20,6 +20,7 @@ RUN mkdir -p /app \
 	&& wget -O/tmp/elasticsearch-${ELASTIC_SEARCH_VERSION}.deb https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ELASTIC_SEARCH_VERSION}.deb \
 	&& dpkg -i /tmp/elasticsearch-${ELASTIC_SEARCH_VERSION}.deb \
 	&& update-rc.d elasticsearch defaults 95 10 \
+	&& echo "${ELASTIC_SEARCH_VERSION}" > /var/run/elasticsearch-version.txt \
 	&& rm /tmp/elasticsearch-${ELASTIC_SEARCH_VERSION}.deb
 
 # Move default configuration files into place
