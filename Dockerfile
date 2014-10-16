@@ -23,6 +23,9 @@ RUN mkdir -p /app \
 	&& echo "${ELASTIC_SEARCH_VERSION}" > /var/run/elasticsearch-version.txt \
 	&& rm /tmp/elasticsearch-${ELASTIC_SEARCH_VERSION}.deb
 
+# Add handy (and small) utilities for when entering container via nsenter
+RUN apt-get install -yqq htop lsof telnet
+
 # Move default configuration files into place
 COPY resources/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 COPY resources/inputs /etc/logstash/conf.d

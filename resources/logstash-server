@@ -32,13 +32,21 @@ function linkStorage() {
 function startServices() {
 	# service rsyslog start
 	service redis-server start
+	# make sure redis log file readable (default was 550)
+	chmod 664 /var/log/redis/redis-server.log
+	# let's get elastic
 	/etc/init.d/elasticsearch start
+	# and stashful
 	service logstash start
 	/opt/logstash/bin/logstash web &
 }
 
 case "$1" in
-	start)
+	cert)
+		cat /app/certs/server.crt
+		logIt "request for SSL CRT certificate from CLI"
+	;;
+	*)
 		# Link up storage so state is maintained beyond just this running container
 		if [[ -d "/storage/lib" ]];then
 			echo "Storage appears to be already existant";
@@ -55,10 +63,6 @@ case "$1" in
 		while true; do
 			sleep 1;
 		done
-	;;
-	cert)
-		cat /app/certs/server.crt
-		logIt "request for SSL CRT certificate from CLI"
 	;;
 esac
 
