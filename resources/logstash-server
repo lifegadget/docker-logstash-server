@@ -1,5 +1,5 @@
 #!/bin/bash
-logFile="/storage/docker-cli.log"
+logFile="/app/logs/docker-cli.log"
 
 function logIt() {
 	timestamp=$( date )
@@ -45,6 +45,7 @@ case "$1" in
 	cert)
 		cat /app/certs/server.crt
 		logIt "request for SSL CRT certificate from CLI"
+		exit 0;
 	;;
 	*)
 		# Link up storage so state is maintained beyond just this running container

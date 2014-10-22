@@ -69,6 +69,8 @@ RUN openssl genrsa -out /app/certs/server.key 2048	\
 RUN touch /var/log/docker-cli.log	
 	
 VOLUME ["/app/certs"]
+RUN mkdir -p /app/logs
+VOLUME ["/app/logs"]
 
 # Start logstash
 COPY resources/logstash-server /usr/local/bin/logstash-server
